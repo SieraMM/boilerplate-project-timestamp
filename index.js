@@ -18,12 +18,6 @@ app.get("/", function (req, res) {
   res.sendFile(__dirname + '/views/index.html');
 });
 
-app.get("/api/date", function (req,res,next) {
-  req.time= new Date().toString();
-next();
-}, function(req,res){
-  res.send({time:req.time})
-});
 
 // your first API endpoint... 
 app.get("/api/hello", function (req, res) {
@@ -31,6 +25,31 @@ app.get("/api/hello", function (req, res) {
 });
 
 
+app.get("/api/:date", function (req,res) {
+  let date = req.params.date
+  
+  const regex =  /\D/g;
+  if( date.match(regex) !==null){ //that means there are characters other than digits
+    date= Date.parse(req.params.date)
+  }
+
+
+ let date_string = parseInt(date);
+ 
+   converted_date = new Date(date_string);
+ 
+   if ( isNaN(converted_date) ){
+    res.json({error: "Invalid Date"})
+  }else 
+    res.json({unix: parseInt(date), utc: converted_date.toUTCString()})
+  });
+
+  app.get("/api/", function (req,res){
+    let converted_date = new Date();
+    let date = Date.parse(converted_date);
+
+    res.json({unix: parseInt(date), utc:converted_date.toUTCString()})
+});
 
 // Listen on port set in environment variable or default to 3000
 var listener = app.listen(process.env.PORT || 3000, function () {
